@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 export default class MathsController extends Controller {
-    constructor(HttpContext, repository ) {
+    constructor(HttpContext ) {
         super(HttpContext);
         
     }
@@ -204,8 +204,14 @@ export default class MathsController extends Controller {
             }
             else {
             if (!isNaN(params.n)) {
+                if (Number(params.n) % 1 != 0) {
 
-                if (Number(params.n) > 0) {
+                    let errorh = "les chiffre a virgule ne sont pas accepter pour cette question";
+                    params = ({ ...params, op: "!", error: errorh });
+                    this.HttpContext.response.JSON(params);
+
+                }
+                else if (Number(params.n) > 0) {
 
 
                     let val = Number(params.n);
@@ -217,9 +223,16 @@ export default class MathsController extends Controller {
                     params = ({ ...params, op: "!", value: val });
                     this.HttpContext.response.JSON(params);
                 }
-                else if (Number(params.n <= 0)) {
+                else if (Number(params.n == 0)) {
 
                     let errorh = "la factoriel de 0 est 1 mais le correcteur n'accepte pas cette réponce :P";
+                    params = ({ ...params, op: "!", error: errorh });
+                    this.HttpContext.response.JSON(params);
+
+
+                }else if (Number(params.n < 0)) {
+
+                    let errorh = "la factoriel d'un negatif n'existe pas";
                     params = ({ ...params, op: "!", error: errorh });
                     this.HttpContext.response.JSON(params);
 
@@ -325,7 +338,14 @@ export default class MathsController extends Controller {
             }
             else {
             if (!isNaN(params.n)) {
-                if (Number(params.n) <= 0) {
+                if (Number(params.n) % 1 != 0) {
+
+                    let errorh = "les chiffre a virgule ne sont pas accepter pour cette question";
+                    params = ({ ...params, op: "np", error: errorh });
+                    this.HttpContext.response.JSON(params);
+
+                }
+                else  if (Number(params.n) <= 0) {
                     let errorh = "n n'est pas un chiffre acceptable pour votre question";
                     params = ({ ...params, op: "np", error: errorh });
                     this.HttpContext.response.JSON(params);
@@ -375,12 +395,15 @@ export default class MathsController extends Controller {
     }
     else if(Object.keys(this.HttpContext.path.params).length==0){
         this.help();
+    }else{
+        this.HttpContext.response.notImplemented();
     }
       
 
 
 
     }
+    
     help() {
         let helpPagePath = path.join(process.cwd(), wwwroot, 'API-Help-Pages/API-Maths-Help.html');
         this.HttpContext.response.HTML(fs.readFileSync(helpPagePath));
